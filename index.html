@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://bootswatch.com/5/lux/bootstrap.min.css">
+</head>
+<body>
+    <div class="container"></div>
+    <script>
+      const url = 'https://api.daaif.net/products?limit=200&delay=3000'
+
+      const xhr = new XMLHttpRequest()
+      xhr.open('GET', url)
+      xhr.onload = () => afficher(JSON.parse(xhr.responseText))
+      xhr.send()
+
+      function afficher(produits) {
+        console.log(produits)
+      }
+
+      // Créer un page qui affiche tous poroduis 
+
+      // un peu sous une forme semblable à celle de la page 
+
+      // https://ecom.daaif.net
+
+</script>
+
+</body>
+</html>
