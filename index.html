@@ -3,30 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="https://bootswatch.com/5/lux/bootstrap.min.css">
-</head>
-<body>
-    <div class="container"></div>
+    <title>Daaif Marketplace - Premium Products</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
-      const url = 'https://api.daaif.net/products?limit=200&delay=3000'
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                        dark: '#1F2937',
+                        light: '#F9FAFB',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .product-image {
+            transition: transform 0.3s ease;
+        }
+        .product-card:hover .product-image {
+            transform: scale(1.05);
+        }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-xl font-bold text-primary">Daaif Marketplace</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="#" class="text-gray-700 hover:text-primary px-3 py-2">Home</a>
+                    <a href="#" class="text-gray-700 hover:text-primary px-3 py-2">Shop</a>
+                    <a href="#" class="text-gray-700 hover:text-primary px-3 py-2">Categories</a>
+                    <a href="#" class="text-gray-700 hover:text-primary px-3 py-2">About</a>
+                    <div class="relative">
+                        <button class="text-gray-700 hover:text-primary">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+                        </button>
+                    </div>
+                    <button class="bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">Sign In</button>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-      const xhr = new XMLHttpRequest()
-      xhr.open('GET', url)
-      xhr.onload = () => afficher(JSON.parse(xhr.responseText))
-      xhr.send()
+    <!-- Hero Banner -->
+    <div class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl font-bold mb-4">Premium Beauty Products</h1>
+            <p class="text-xl mb-8">Discover our curated collection of high-quality beauty essentials</p>
+            <button class="bg-white text-primary px-6 py-3 rounded-md font-medium hover:bg-gray-100 transition">Shop Now</button>
+        </div>
+    </div>
 
-      function afficher(produits) {
-        console.log(produits)
-      }
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Enhanced Filters Section -->
+        <div class="mb-6 bg-gray-50 p-4 rounded-lg">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <!-- Search Bar -->
+                <div>
+                    <label for="search-input" class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                    <input type="text" id="search-input" placeholder="Search products..." 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                </div>
+                
+                <!-- Category Filter -->
+                <div>
+                    <label for="category-filter" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                    <select id="category-filter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="">All Categories</option>
+                    </select>
+                </div>
+                
+                <!-- Brand Filter -->
+                <div>
+                    <label for="brand-filter" class="block text-sm font-medium text-gray-700 mb-1">Brand</label>
+                    <select id="brand-filter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="">All Brands</option>
+                    </select>
+                </div>
+                
+                <!-- Price Filter -->
+                <div>
+                    <label for="price-filter" class="block text-sm font-medium text-gray-700 mb-1">Price Range</label>
+                    <select id="price-filter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="">All Prices</option>
+                        <option value="under10">Under $10</option>
+                        <option value="10to50">$10 - $50</option>
+                        <option value="50to100">$50 - $100</option>
+                        <option value="over100">Over $100</option>
+                    </select>
+                </div>
+            </div>
+        </div>
 
-      // Créer un page qui affiche tous poroduis 
+        <!-- Products Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="products-container">
+            <!-- Products will be inserted here by JavaScript -->
+        </div>
 
-      // un peu sous une forme semblable à celle de la page 
+        <!-- Pagination -->
+        <div id="pagination" class="flex justify-center mt-8"></div>
 
-      // https://ecom.daaif.net
+        <!-- Loading Indicator -->
+        <div id="loading" class="text-center py-12">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+            <p class="mt-2 text-gray-600">Loading products...</p>
+        </div>
+    </main>
 
-</script>
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Daaif Marketplace</h3>
+                    <p class="text-gray-400">Premium products for your beauty needs. Quality you can trust.</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Shop</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">All Products</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">New Arrivals</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Best Sellers</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Special Offers</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Customer Service</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Contact Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">FAQs</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Shipping & Returns</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Newsletter</h4>
+                    <p class="text-gray-400 mb-4">Subscribe to get updates on new products and special offers.</p>
+                    <div class="flex">
+                        <input type="email" placeholder="Your email" class="px-4 py-2 rounded-l-md w-full text-gray-800">
+                        <button class="bg-primary px-4 py-2 rounded-r-md hover:bg-blue-600">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2023 Daaif Marketplace. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
 
+    <script src="app.js"></script>
 </body>
 </html>
