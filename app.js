@@ -14,46 +14,40 @@ let filteredProducts = [];
 let currentPage = 1;
 
 // Main function to fetch products
-function getProductsData() {
+async function getProductsData() {
     const url = "https://api.daaif.net/products?limit=200&delay=3000";
 
-    loadingElement.style.display = 'block';
-    
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', url);
-
-    xhr.onload = () => {
-        if (xhr.status >= 200 && xhr.status < 300) {
-            try {
-                const response = JSON.parse(xhr.responseText);
-                allProducts = Object.values(response.products);
-                
-                initFilters();
-                applyFilters();
-                loadingElement.style.display = 'none';
-                
-            } catch (e) {
-                console.error("JSON parsing error:", e);
-                loadingElement.innerHTML = '<p class="text-red-500">Error loading products. Please try again later.</p>';
-            }
-        } else {
-            console.error("HTTP error:", xhr.statusText);
-            loadingElement.innerHTML = '<p class="text-red-500">Error loading products. Please try again later.</p>';
+    try {
+        loadingElement.style.display = 'block';
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
         }
-    };
-
-    xhr.onerror = () => {
-        console.error("Network error");
-        loadingElement.innerHTML = '<p class="text-red-500">Network error. Please check your connection.</p>';
-    };
-
-    xhr.send();
+        
+        const data = await response.json();
+        allProducts = Object.values(data.products);
+        initFilters();
+        applyFilters();
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        loadingElement.innerHTML = '<p class="text-red-500">Error loading products. Please try again later.</p>';
+    } finally {
+        loadingElement.style.display = 'none';
+    }
 }
 
 // Initialize filter options
 function initFilters() {
-    // Categories
+    // Clear existing options
+    categoryFilter.innerHTML = '<option value="">All Categories</option>';
+    brandFilter.innerHTML = '<option value="">All Brands</option>';
+
+    // Get unique categories and brands
     const categories = [...new Set(allProducts.map(p => p.category))];
+    const brands = [...new Set(allProducts.map(p => p.brand))];
+
+    // Populate category filter
     categories.forEach(category => {
         const option = document.createElement('option');
         option.value = category;
@@ -61,8 +55,7 @@ function initFilters() {
         categoryFilter.appendChild(option);
     });
 
-    // Brands
-    const brands = [...new Set(allProducts.map(p => p.brand))];
+    // Populate brand filter
     brands.forEach(brand => {
         const option = document.createElement('option');
         option.value = brand;
@@ -73,16 +66,22 @@ function initFilters() {
 
 // Apply filters and show results
 function applyFilters() {
-    const searchTerm = searchInput.value.toLowerCase();
+    const searchTerm = searchInput.value.trim().toLowerCase();
     const selectedCategory = categoryFilter.value;
     const selectedBrand = brandFilter.value;
     const selectedPrice = priceFilter.value;
 
     filteredProducts = allProducts.filter(product => {
-        const matchesSearch = product.title.toLowerCase().includes(searchTerm) || 
-                             product.description.toLowerCase().includes(searchTerm) ||
-                             product.brand.toLowerCase().includes(searchTerm);
+        // Search in multiple fields
+        const searchFields = [
+            product.title,
+            product.description,
+            product.brand,
+            product.category,
+            ...product.tags || []
+        ].join(' ').toLowerCase();
         
+        const matchesSearch = searchTerm === '' || searchFields.includes(searchTerm);
         const matchesCategory = !selectedCategory || product.category === selectedCategory;
         const matchesBrand = !selectedBrand || product.brand === selectedBrand;
         
@@ -104,7 +103,7 @@ function applyFilters() {
     renderPagination();
 }
 
-// Display products
+// Render products to the page
 function renderProducts() {
     const startIndex = (currentPage - 1) * productsPerPage;
     const endIndex = startIndex + productsPerPage;
@@ -113,7 +112,13 @@ function renderProducts() {
     productsContainer.innerHTML = '';
 
     if (productsToShow.length === 0) {
-        productsContainer.innerHTML = '<p class="text-center py-8 text-gray-500 col-span-full">No products found matching your criteria.</p>';
+        productsContainer.innerHTML = `
+            <div class="col-span-full text-center py-12">
+                <i class="fas fa-search text-4xl text-gray-300 mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-700">No products found</h3>
+                <p class="text-gray-500 mt-1">Try adjusting your search or filters</p>
+            </div>
+        `;
         return;
     }
 
@@ -167,7 +172,6 @@ function renderProducts() {
                 </div>
             </div>
         `;
-        
         productsContainer.insertAdjacentHTML('beforeend', html);
     });
 
@@ -181,7 +185,7 @@ function renderProducts() {
     });
 }
 
-// Handle pagination
+// Render pagination controls
 function renderPagination() {
     const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
     
@@ -371,12 +375,25 @@ function showProductDetails(product) {
     });
 }
 
+// Debounce function to improve performance
+function debounce(func, wait) {
+    let timeout;
+    return function() {
+        const context = this;
+        const args = arguments;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            func.apply(context, args);
+        }, wait);
+    };
+}
+
 // Initialize the page
 document.addEventListener('DOMContentLoaded', function() {
     getProductsData();
     
-    // Event listeners for filters
-    searchInput.addEventListener('input', applyFilters);
+    // Event listeners with debouncing for better performance
+    searchInput.addEventListener('input', debounce(applyFilters, 300));
     categoryFilter.addEventListener('change', applyFilters);
     brandFilter.addEventListener('change', applyFilters);
     priceFilter.addEventListener('change', applyFilters);
